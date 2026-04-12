@@ -1,0 +1,98 @@
+###REGISTER
+POST  http://localhost:5000/common-api/common
+Content-Type: application/json
+
+{
+    "firstName":"thraiam",
+     "lastName":"vulli",
+     "email":"thraiambica@gmail.com",
+     "password":"thraiam",
+     "role":"USER",
+     "profileImageUrl":""
+}
+
+###LOGIN
+POST  http://localhost:5000/common-api/login
+Content-Type: application/json
+
+{
+    "email":"amulya@gmail.com",
+    "password":"amulyaaaa"
+}
+
+###LOGOUT
+GET http://localhost:5000/common-api/logout
+
+
+
+### Create article
+POST http://localhost:5000/author-api/article
+Content-Type: application/json
+
+{
+    "author":"69b3ccaa4b5d50e50f9589d5",
+    "title":"Article -1 by srimai",
+    "category":"programming",
+    "content":"testing article on programming"
+}
+
+###get articles
+GET http://localhost:5000/author-api/articles/69b3d548207dff293e2b062c
+
+
+### Update article
+PUT http://localhost:5000/author-api/article
+Content-Type: application/json
+
+{
+    "articleId":"69b3cccc4b5d50e50f9589d9",
+    "title":"Article -1 by srimai updated",
+    "category":"programming",
+    "content":"testing article on programming updated"
+}
+
+###delete/restore using put and patch [patch is used when we dont want to make complete replacement]
+PATCH http://localhost:5000/author-api/articles 
+Content-Type: application/json
+
+{
+    "articleId":"69b3cccc4b5d50e50f9589d9",
+    "isArticleActive":false
+}
+
+
+
+###read articles
+GET  http://localhost:5000/user-api/articles 
+
+###comment
+PUT http://localhost:5000/user-api/comment/69b3acec4b5fc7715d5d5f42
+Content-Type: application/json
+
+{
+    "comment":"it was helpful"
+}
+
+### new password 
+PUT  http://localhost:5000/common-api/password
+Content-Type: application/json
+
+{
+    "email":"amulya@gmail.com",
+    "newpassword":"amulya"
+    
+}
+
+### Admin articles
+GET  http://localhost:5000/admin-api/articles
+
+###LOGIN ADMIN
+POST http://localhost:5000/common-api/login
+Content-Type: application/json
+
+{
+     "email":"admin@gmail.com",
+     "password":"admin"
+}
+
+
