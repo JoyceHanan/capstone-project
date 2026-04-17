@@ -43,7 +43,7 @@ function EditArticle() {
     //add articleId to modified article
     modifiedArticle.articleId=article._id;
     //make PUT req to update article
-    let res=await axios.put("http://localhost:5000/author-api/article",
+    let res=await axios.put("https://capstone-project-8ab0.onrender.com/author-api/article",
       modifiedArticle,
       {withCredentials:true})
     //naviagte to articleById component

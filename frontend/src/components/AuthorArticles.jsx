@@ -37,7 +37,7 @@ function AuthorArticles() {
         setLoading(true);
 
         let res = await axios.get(
-          `http://localhost:5000/author-api/articles/${user._id}`, 
+          `https://capstone-project-8ab0.onrender.com/author-api/articles/${user._id}`, 
           { withCredentials: true }
         );
 

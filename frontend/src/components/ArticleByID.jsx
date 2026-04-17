@@ -50,7 +50,7 @@ function ArticleByID() {
 
       try {
         const res = await axios.get(
-          `http://localhost:5000/user-api/article/${id}`,
+          `https://capstone-project-8ab0.onrender.com/user-api/article/${id}`,
           { withCredentials: true }
         );
 
@@ -84,7 +84,7 @@ function ArticleByID() {
 
     try {
       const res = await axios.patch(
-        "http://localhost:5000/author-api/articles",
+        "https://capstone-project-8ab0.onrender.com/author-api/articles",
         { articleId: article._id, isArticleActive: newStatus },
         { withCredentials: true }
       );
@@ -118,7 +118,7 @@ function ArticleByID() {
     console.log(commentObj);
 
     let res = await axios.put(
-      "http://localhost:5000/user-api/comment/",
+      "https://capstone-project-8ab0.onrender.com/user-api/comment/",
       commentObj,
       { withCredentials: true }
     );
