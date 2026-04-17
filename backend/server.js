@@ -18,6 +18,7 @@ app.use(
     credentials:true  //enables to send the token back to clients
   })
 );
+app.options("*", cors());
 app.use(cookieParser()) 
 app.use(exp.json())
 app.use("/user-api",userApp)
