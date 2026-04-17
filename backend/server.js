@@ -14,11 +14,11 @@ config();
 const app=exp()
 app.use(
   cors({
-    origin: ["http://localhost:5173","https://capstone-project-rosy-seven.vercel.app"],
+    origin: ["http://localhost:5173"],
     credentials:true  //enables to send the token back to clients
   })
 );
-app.options("*", cors());
+
 app.use(cookieParser()) 
 app.use(exp.json())
 app.use("/user-api",userApp)
