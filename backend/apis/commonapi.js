@@ -41,7 +41,7 @@ commonApp.post("/common",upload.single("profileImageUrl"),async(req,res)=>{
         res.cookie("token",token,{
             httpOnly:true,
             sameSite:"none",
-            secure:false,
+            secure:true,
         })
         
         //send user data without password
@@ -84,7 +84,7 @@ commonApp.post("/login", async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "none",
-      secure: false,
+      secure: true,
     })
 
     let userObj = user.toObject()
