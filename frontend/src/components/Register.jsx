@@ -33,7 +33,7 @@ function Register() {
     try {
       setLoading(true);
       let res = await axios.post(
-        "https://capstone-project-ycw3.onrender.com/common-api/common",
+        "/common-api/common",
         userObj
       );
 
