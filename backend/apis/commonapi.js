@@ -165,18 +165,3 @@ commonApp.put("/password",verifytoken("USER","AUTHOR","ADMIN"),async(req,res)=>{
   res.status(200).json({message:"the password has been updated"})
 })
 
-commonApp.get("/create-admin", async (req, res) => {
-  try {
-    const hashedPassword = await hash("admin", 12)
-    const admin = new UserModel({
-      firstName: "admin",
-      email: "admin@gmail.com",
-      password: hashedPassword,
-      role: "ADMIN"
-    })
-    await admin.save()
-    res.json({ message: "Admin created!" })
-  } catch(err) {
-    res.json({ error: err.message })
-  }
-})
