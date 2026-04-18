@@ -40,7 +40,7 @@ commonApp.post("/common",upload.single("profileImageUrl"),async(req,res)=>{
         const token=sign({id:newUserDoc._id,email:newUserDoc.email,role:newUserDoc.role},process.env.SECRET_KEY,{expiresIn:"1h"});
         res.cookie("token",token,{
             httpOnly:true,
-            sameSite:"lax",
+            sameSite:"none",
             secure:false,
         })
         
@@ -83,7 +83,7 @@ commonApp.post("/login", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: "none",
       secure: false,
     })
 
