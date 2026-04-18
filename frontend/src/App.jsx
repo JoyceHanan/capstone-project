@@ -12,7 +12,7 @@ import WriteArticles from "./components/WriteArticles";
 import ArticleByID from "./components/ArticleById";
 import {Toaster} from "react-hot-toast";
 import Unauthorized from "./components/Unauthorized";
-import ProtectedRoute from "./components/Protectedroute";
+import ProtectedRoute from "./components/ProtectedRoute";
 import './App.css'
 function App() {
   const routerObj = createBrowserRouter([
