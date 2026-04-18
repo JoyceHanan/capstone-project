@@ -32,8 +32,6 @@ function Register() {
     console.log(userObj);
     try {
       setLoading(true);
-
-      // ✅ FIXED URL (same backend as login)
       let res = await axios.post(
         "http://localhost:5000/common-api/common",
         userObj
