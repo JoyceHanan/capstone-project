@@ -8,13 +8,13 @@ import {commonApp} from "./apis/commonapi.js"
 import cookieParser from "cookie-parser"
 import dotenv from "dotenv";
 import cors from 'cors'
+config();
 dotenv.config();
 
-config();
 const app=exp()
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: "http://localhost:5173",
     credentials:true  //enables to send the token back to clients
   })
 );

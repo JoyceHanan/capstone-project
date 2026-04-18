@@ -5,11 +5,14 @@ import Register from "./components/Register";
 import Login from "./components/Login";
 import UserProfile from "./components/UserProfile";
 import AuthorProfile from "./components/AuthorProfile";
-import AuthorArticles from "./components/AuthorArticles";
-import EditArticle from './components/EditArticle'
-import WriteArticles from "./components/WriteArticles";
-import ArticleByID from "./components/ArticleByID";
 import AdminProfile from "./components/AdminProfile";
+import AuthorArticles from "./components/AuthorArticles";
+import EditArticle from "./components/EditArticle";
+import WriteArticles from "./components/WriteArticles";
+import ArticleByID from "./components/ArticleById";
+import {Toaster} from "react-hot-toast";
+import Unauthorized from "./components/Unauthorized";
+import ProtectedRoute from "./components/Protectedroute";
 import './App.css'
 function App() {
   const routerObj = createBrowserRouter([
@@ -31,11 +34,19 @@ function App() {
         },
         {
           path: "user-profile",
-          element: <UserProfile />,
+          element: (
+            <ProtectedRoute allowedRoles={["USER"]}>
+              <UserProfile />
+            </ProtectedRoute>
+          ),
         },
         {
           path: "author-profile",
-          element: <AuthorProfile />,
+          element: (
+            <ProtectedRoute allowedRoles={["AUTHOR"]}>
+              <AuthorProfile />
+            </ProtectedRoute>
+          ),
 
           children: [
             {
@@ -53,6 +64,14 @@ function App() {
           ],
         },
         {
+          path: "admin-profile",
+          element: (
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <AdminProfile />
+            </ProtectedRoute>
+          ),
+        },
+        {
           path: "article/:id",
           element: <ArticleByID />,
         },
@@ -61,28 +80,19 @@ function App() {
           element: <EditArticle />,
         },
         {
-  path: "admin-profile",
-  element: <AdminProfile />,
-  children: [
-    {
-      index: true,
-      element: <AuthorArticles />
-    },
-    {
-      path: "articles",
-      element: <AuthorArticles />
-    },
-    {
-      path: "write-article",
-      element: <WriteArticles />
-    }
-  ]
-}
+          path: "unauthorized",
+          element: <Unauthorized />,
+        },
       ],
     },
   ]);
 
-  return <RouterProvider router={routerObj} />;
+  return (
+    <div>
+      <Toaster position="top-center" reverseOrder={false} />
+      <RouterProvider router={routerObj} />
+    </div>
+  );
 }
 
 export default App;

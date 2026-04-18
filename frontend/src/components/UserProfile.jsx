@@ -28,10 +28,10 @@ function UserProfile() {
       setLoading(true);
       try {
         //read articles of all authors
-        let res=await axios.get("https://capstone-project-8ab0.onrender.com/user-api/articles",{withCredentials:true})
+        let res=await axios.get("http://localhost:5000/user-api/articles",{withCredentials:true})
         //update articles state
         if(res.status===200){
-          setArticles(res.data.payload)
+          setArticles((await res).data.payload)
         }
       } catch (err) {
         setError(err.response?.data?.error || "Something went wrong");
@@ -78,9 +78,9 @@ function UserProfile() {
         {/* LEFT */}
         <div className="flex items-center gap-4">
           {/* Avatar */}
-          {currentUser?.profileImageUrl ? (
+          {currentUser?.profileImageURL ? (
             <img
-              src={currentUser.profileImageUrl}
+              src={currentUser.profileImageURL}
               className="w-16 h-16 rounded-full object-cover border"
               alt="profile"
             />

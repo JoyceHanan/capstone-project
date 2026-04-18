@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import axios from "axios";
-
+import {toast} from 'react-hot-toast'
 import { useNavigate } from "react-router";
 
 import {
@@ -38,14 +38,15 @@ function WriteArticles() {
       //set loading true
       setLoading(true);
       //make POST req to save new article
-      let res = await axios.post("https://capstone-project-8ab0.onrender.com/author-api/article", articleObj, { withCredentials: true });
+      let res = await axios.post("http://localhost:5000/author-api/article", articleObj, { withCredentials: true });
       //navigate to AuthorArticles
       if (res.status === 201) {
+        toast.success("Article published successfully")
         navigate("../articles");
         // navigate("./author-profile/articles");
       }
     } catch (err) {
-      // toast.error(err.response?.data?.error || "Failed to publish article");
+       toast.error(err.response?.data?.error || "Failed to publish article");
     } finally {
       setLoading(false);
     }

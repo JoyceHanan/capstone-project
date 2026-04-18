@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
@@ -28,25 +27,17 @@ function AuthorArticles() {
   console.log("user in author profile", user);
 
   useEffect(() => {
-    if (!user?._id) return;   
+    if (!user) return;
 
     const getAuthorArticles = async () => {
-      setLoading(true);
-
       try {
         setLoading(true);
-
-        let res = await axios.get(
-          `https://capstone-project-8ab0.onrender.com/author-api/articles/${user._id}`, 
-          { withCredentials: true }
-        );
-
         //read articles of current author
+        let res = await axios.get("http://localhost:5000/author-api/articles", { withCredentials: true });
         if (res.status === 200) {
-          setArticles(res.data.payload); 
+          setArticles(res.data.payload);
         }
         //update articles state
-
       } catch (err) {
         console.log(err);
         setError(err.response?.data?.error || "Failed to fetch articles");
@@ -92,15 +83,10 @@ function AuthorArticles() {
 
             <p className={articleTitle}>{article.title}</p>
 
-            <p className={articleExcerpt}>
-              {article.content.slice(0, 60)}...
-            </p>
+            <p className={articleExcerpt}>{article.content.slice(0, 60)}...</p>
           </div>
 
-          <button
-            className={`${ghostBtn} mt-auto pt-4`}
-            onClick={() => openArticle(article)}
-          >
+          <button className={`${ghostBtn} mt-auto pt-4`} onClick={() => openArticle(article)}>
             Read Article →
           </button>
         </div>
@@ -110,4 +96,3 @@ function AuthorArticles() {
 }
 
 export default AuthorArticles;
-

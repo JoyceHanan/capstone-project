@@ -1,9 +1,7 @@
-
 import { useAuth } from "../store/authStore";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-
+import { useNavigate } from "react-router";   // 👈 added
 import {
   pageWrapper,
   secondaryBtn,
@@ -21,8 +19,8 @@ import {
 
 function AdminProfile() {
   const currentUser = useAuth((state) => state.currentUser);
-  const logout = useAuth((state) => state.logout);
-  const navigate = useNavigate();
+  const logout = useAuth((state) => state.logout);   // 👈 added
+  const navigate = useNavigate();                    // 👈 added
 
   const [view, setView] = useState("users");
   const [loading, setLoading] = useState(false);
@@ -31,7 +29,7 @@ function AdminProfile() {
   const [articles, setArticles] = useState([]);
   const [updatingUserId, setUpdatingUserId] = useState(null);
 
-  const onLogout = async () => {
+  const handleLogout = async () => {                 // 👈 added
     await logout();
     navigate("/login");
   };
@@ -41,8 +39,8 @@ function AdminProfile() {
     setError(null);
     try {
       const [usersRes, articlesRes] = await Promise.all([
-        axios.get("https://capstone-project-8ab0.onrender.com/admin-api/users", { withCredentials: true }),
-        axios.get("https://capstone-project-8ab0.onrender.com/admin-api/articles", { withCredentials: true }),
+        axios.get("http://localhost:5000/admin-api/users", { withCredentials: true }),
+        axios.get("http://localhost:5000/admin-api/articles", { withCredentials: true }),
       ]);
 
       setUsers(usersRes.data.payload || []);
@@ -69,8 +67,11 @@ function AdminProfile() {
     setUpdatingUserId(user._id);
     try {
       await axios.patch(
-        "https://capstone-project-8ab0.onrender.com/admin-api/users",
-        { userId: user._id, isActive: !user.isActive },
+        "http://localhost:5000/admin-api/users",
+        {
+          userId: user._id,
+          isActive: !user.isActive,
+        },
         { withCredentials: true }
       );
 
@@ -117,12 +118,12 @@ function AdminProfile() {
               Articles
             </button>
 
-            <button
-              className="bg-[#ff3b30] text-white text-sm px-5 py-2 rounded-full hover:bg-[#d62c23] transition"
-              onClick={onLogout}
-            >
-              Logout
-            </button>
+            
+             <button
+          className="bg-[#ff3b30] text-white text-sm px-5 py-2 rounded-full hover:bg-[#d62c23] transition"
+          onClick={handleLogout}>
+          Logout
+        </button>
           </div>
         </div>
       </div>
@@ -158,9 +159,7 @@ function AdminProfile() {
                       Status:{" "}
                       <span
                         className={
-                          user.isActive
-                            ? "text-[#248a3d]"
-                            : "text-[#cc2f26]"
+                          user.isActive ? "text-[#248a3d]" : "text-[#cc2f26]"
                         }
                       >
                         {user.isActive ? "Active" : "Blocked"}
@@ -224,4 +223,3 @@ function AdminProfile() {
 }
 
 export default AdminProfile;
-

@@ -1,83 +1,168 @@
-import exp from "express";
-import { UserModel } from "../models/usermodel.js";
-import {hash,compare} from 'bcryptjs' //IF ANY FUNCTION NAME ENDS WITH SYNC ITS SYNCHRONUS METHOD
-import jwt from 'jsonwebtoken'
+import exp from 'express'
+import { UserModel } from '../models/usermodel.js'
+import { hash,compare } from 'bcryptjs'
 import {config} from 'dotenv'
-import { verifytoken } from "../middleware/verifytoken.js";
+import { verifytoken } from '../middleware/verifytoken.js'
+import { upload } from '../config/multer.js'
+import { uploadToCloudinary } from '../config/cloudinaryUpload.js'
+//we can use hashSynch and comparesync for synchronous functions
+import jwt from 'jsonwebtoken'
+const {sign,verify}=jwt 
 export const commonApp=exp.Router()
-const {sign}=jwt
-//route for regiter(USER,AUTHOR)
-commonApp.post("/common",async(req,res)=>{
-   let allowedRoles=["USER","AUTHOR"]
-    const newUser=req.body
-    //check role 
-    // we can search using includes method ex:[1,2,3,4].includes(3) -> true
-    if(!allowedRoles.includes(newUser.role)){
-      return res.status(400).json({message:"invalid role"})
+//route for register
+commonApp.post("/common",upload.single("profileImageUrl"),async(req,res)=>{
+    try{
+        //get user from req
+        const newUser=req.body
+        //check for the role 
+        let allowedRoles=['USER','AUTHOR']
+        // finding elements in an array using include method it returns true or false 
+        if(!allowedRoles.includes(newUser.role)){
+          return res.status(400).json({message:"invalid Role"})
+        }
+        //validators wont work during update but only after save function theyll work to make sure validators work before 
+        //we run validators manually 
+        
+        //hash the password and replace plain with hash
+        newUser.password=await hash(newUser.password,12)
+        
+        //handle file upload to cloudinary
+        if(req.file){
+            const uploadResult=await uploadToCloudinary(req.file.buffer)
+            newUser.profileImageURL=uploadResult.secure_url
+        }
+        
+        //create new user document
+        const newUserDoc=new UserModel(newUser)
+        await newUserDoc.save()
+        
+        //auto-login user after registration
+        const token=sign({id:newUserDoc._id,email:newUserDoc.email,role:newUserDoc.role},process.env.SECRET_KEY,{expiresIn:"1h"});
+        res.cookie("token",token,{
+            httpOnly:true,
+            sameSite:"lax",
+            secure:false,
+        })
+        
+        //send user data without password
+        let userObj=newUserDoc.toObject()
+        delete userObj.password
+        res.status(201).json({message:"user has registered",payload:userObj})
+    }catch(err){
+        console.log("Registration error:",err)
+        res.status(500).json({message:"Registration failed",error:err.message})
     }
-      //hash password
-      newUser.password=await hash(newUser.password,12)
-    // create user 
-    const newUserDoc=new UserModel(newUser)
-  //save document
-  await newUserDoc.save()
-  res.status(201).json({message:"user created"})
 })
-//route for login(USER,AUTHOR,ADMIN) login == creating token
-commonApp.post("/login",async(req,res)=>{
-  console.log(req.body)
-  //get user cred from req body
-  const {email, password} = req.body;
-  let user = await UserModel.findOne({email:email})
-  if(!user){
-    return res.status(400).json({message:"user not found"})
+
+//route for login geting token
+commonApp.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body
+
+    console.log("LOGIN HIT")
+    console.log("Email:", email)
+    console.log("Body:", req.body)
+
+    let user = await UserModel.findOne({ email })
+    console.log("User found:", user)  // ← will now tell us if user is null
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email" })
+    }
+
+    const isPasswordValid = await compare(password, user.password)
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid password" })
+    }
+
+    const token = sign(
+      { id: user._id, email: user.email, role: user.role },
+      process.env.SECRET_KEY,
+      { expiresIn: "1h" }
+    )
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+    })
+
+    let userObj = user.toObject()
+    delete userObj.password
+
+    res.status(200).json({ message: "Login successful", payload: userObj })
+
+  } catch (err) {
+    console.log("Login error:", err)  // ← this will now show the real error
+    res.status(500).json({ message: "Login failed", error: err.message })
   }
-  let result = await compare(password,user.password)
-   if(!result){
-       return res.status(400).json({message:"password invalid "})
-    }
-    let signedtoken=sign({id:user._id,email:user.email,role:user.role},process.env.SECRET_KEY,{expiresIn:"2w"})
-    res.cookie("token",signedtoken,{                //if normal cookie client side server can read it
-      httpOnly:true,
-      sameSite:"lax",
-      secure:false
-})//remove password from user doc
-let userObj=user.toObject()
-delete userObj.password
-res.status(200).json({message:"login successful",payload:userObj})
 })
-//route for logout == removing token
-commonApp.get("/logout",async(req,res)=>{
+//route for logout removing token 
+commonApp.get("/logout",(req,res)=>{
   res.clearCookie("token",{
-     httpOnly:true,
-      sameSite:"lax",
-      secure:false
+    httpOnly:true,
+    sameSite:"lax",
+    secure:false,
   })
-  res.status(200).json({message:"logout successful"})
+  res.status(200).json({message:"logout successfull"})
 })
-//Page refresh
-commonApp.get("/check-auth",verifytoken("USER","AUTHOR","ADMIN"),(req,res)=>{
-  res.status(200).json({
-    message:"authenticated",
-    payload:req.user,
-  })
+
+//route for checking auth status
+commonApp.get("/check-auth",verifytoken("USER","AUTHOR","ADMIN"),async(req,res)=>{
+   console.log("CHECK AUTH HIT"); 
+  try{
+    const token=req.cookies.token
+    if(!token){
+      return res.status(401).json({message:"no token found"})
+    }
+    const decoded=verify(token,process.env.SECRET_KEY)
+    const user=await UserModel.findById(decoded.id)
+    if(!user){
+      return res.status(401).json({message:"user not found"})
+    }
+    let userObj=user.toObject()
+    delete userObj.password
+    res.status(200).json({message:"user authenticated",payload:userObj})
+  }catch(err){
+    return res.status(401).json({message:"authentication failed"})
+  }
 })
-//to change the password 
+
 commonApp.put("/password",verifytoken("USER","AUTHOR","ADMIN"),async(req,res)=>{
-  let {newpassword,email} = req.body
-  const user=req.user
-  if(user.email!==email){
-    return res.status(400).json({message:"email mismatch"})
-  }
+  //check current password and new password are same or not
+  const {email,password,newpassword}=req.body
+
   //get user from DB
-  const userDB = await UserModel.findOne({email})
-  //check new password same as old
-  let result = await compare(newpassword,userDB.password)
-  if(result){
-    return res.status(400).json({message:"current password and new password cannot be same"})
+  const user=await UserModel.findOne({email})
+
+  if(!user){
+    return res.status(404).json({message:"user not found"})
   }
+
+  //check current password
+  const isPasswordValid=await compare(password,user.password)
+
+  if(!isPasswordValid){
+    return res.status(401).json({message:"invalid current password"})
+  }
+
+  //check if old and new password are same
+  const isSame=await compare(newpassword,user.password)
+
+  if(isSame){
+    return res.status(400).json({message:"the old and new password cant be the same"})
+  }
+
   //hash new password
-  newpassword = await hash(newpassword,12)
-  await UserModel.findOneAndUpdate( {email:email}, {password:newpassword})
-  res.status(200).json({message:"password updated successfully"})
+  const hashedPassword=await hash(newpassword,12)
+
+  //update password
+  const modified=await UserModel.findOneAndUpdate(
+      {email:email},
+      {$set:{password:hashedPassword}},
+      {new:true,runValidators:true},
+  )
+
+  //send req
+  res.status(200).json({message:"the password has been updated"})
 })

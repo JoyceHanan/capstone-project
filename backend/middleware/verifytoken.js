@@ -5,6 +5,7 @@ dotenv.config();
 export const verifytoken=(...allowedrole)=>{
    return (req,res,next)=>{
     //get token from cookie
+    console.log("COOKIES:", req.cookies);
     try{
     const token = req.cookies?.token;
     console.log(token)

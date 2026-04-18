@@ -55,7 +55,7 @@ userApp.put("/comment", verifytoken("USER"), async (req, res) => {
 
     await articleDocument.save();
 
-    // 🔥 RE-FETCH WITH POPULATE (IMPORTANT FIX)
+    
     const updatedArticle = await ArticleModel
       .findById(articleId)
       .populate("comments.user");

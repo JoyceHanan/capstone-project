@@ -92,7 +92,7 @@ Content-Type: application/json
 
 {
      "email":"admin@gmail.com",
-     "password":"admin"
+     "password":"admin123"
 }
 
 

@@ -30,7 +30,7 @@ authorApp.post("/article", verifytoken("AUTHOR"), async(req,res)=>{
     res.status(201).json({message:"article created"})
 })
 //read own articles 
-authorApp.get("/articles/:_id",verifytoken("AUTHOR"),async(req,res)=>{
+authorApp.get("/articles",verifytoken("AUTHOR"),async(req,res)=>{
     let idoftoken=req.user?.id
           let articleslist = await ArticleModel.find({ author: idoftoken });
     res.status(200).json({message:"articles of author",payload:articleslist})
