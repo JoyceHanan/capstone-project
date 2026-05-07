@@ -183,16 +183,36 @@ function Register() {
           <div className={formGroup}>
             <label className={labelClass}>Profile Image</label>
 
-            {/* ✅ FIXED FIELD NAME */}
             <input
-              type="text"
-              {...register("profileImageUrl")}
+              type="file"
+              className={inputClass}
+              accept="image/png, image/jpeg"
+              {...register("profileImageUrl", {
+                validate: {
+                  fileType: (files) => {
+                    if (!files?.[0]) return true;
+                    return ["image/png", "image/jpeg"].includes(files[0].type) || "Only JPG/PNG allowed";
+                  },
+                  fileSize: (files) => {
+                    if (!files?.[0]) return true;
+                    return files[0].size <= 2 * 1024 * 1024 || "MAx size 2MB";
+                  },
+                },
+              })}
+              onChange={(event) => {
+                let file = event.target.files[0];
+                if (file) {
+                  setPriview(URL.createObjectURL(file));
+                }
+              }}
             />
 
-            {errors.profileImageUrl && (
-              <p className={errorClass}>
-                {errors.profileImageUrl.message}
-              </p>
+            {errors.profileImageUrl && <p className={errorClass}>{errors.profileImageUrl.message}</p>}
+            {/* image preview */}
+            {preview && (
+              <div className="mt-3 flex justify-center">
+                <img src={preview} alt="" className="w-24 h-24 rounded-full object-cover" />
+              </div>
             )}
           </div>
 
