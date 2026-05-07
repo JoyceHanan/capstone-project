@@ -78,9 +78,9 @@ function UserProfile() {
         {/* LEFT */}
         <div className="flex items-center gap-4">
           {/* Avatar */}
-          {currentUser?.profileImageURL ? (
+          {currentUser?.profileImageUrl ? (
             <img
-              src={currentUser.profileImageURL}
+              src={currentUser.profileImageUrl}
               className="w-16 h-16 rounded-full object-cover border"
               alt="profile"
             />
