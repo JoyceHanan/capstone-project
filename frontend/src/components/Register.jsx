@@ -25,25 +25,30 @@ function Register() {
 
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
-  const [preview, setPreview] = useState(null);  
+  const [preview, setPreview] = useState(null);
 
   const onUserRegister = async (userObj) => {
-    console.log(userObj);
     try {
       setLoading(true);
-      let res = await axios.post("/common-api/common", userObj);
+
+      const formData = new FormData();
+      formData.append("firstName", userObj.firstName);
+      formData.append("lastName", userObj.lastName);
+      formData.append("email", userObj.email);
+      formData.append("password", userObj.password);
+      formData.append("role", userObj.role);
+      if (userObj.profileImageUrl?.[0]) {
+        formData.append("profileImageUrl", userObj.profileImageUrl[0]);
+      }
+
+      let res = await axios.post("/common-api/common", formData);
 
       if (res.status === 201) {
         navigate("/login");
       }
     } catch (err) {
-      console.log("err in registration", err);
       setApiError(
-        err.response?.data?.err ||
-        err.response?.data?.error ||
-        err.response?.data?.message ||
-        err.message ||
-        "Registration Failed"
+        err.response?.data?.message || err.message || "Registration Failed"
       );
     } finally {
       setLoading(false);
@@ -166,7 +171,7 @@ function Register() {
               onChange={(event) => {
                 let file = event.target.files[0];
                 if (file) {
-                  setPreview(URL.createObjectURL(file));  
+                  setPreview(URL.createObjectURL(file));
                 }
               }}
             />
@@ -180,7 +185,7 @@ function Register() {
 
           {/* SUBMIT */}
           <button type="submit" className={submitBtn}>
-            Create Account
+            {loading ? "Registering..." : "Create Account"}
           </button>
         </form>
 
