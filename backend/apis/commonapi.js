@@ -29,7 +29,7 @@ commonApp.post("/common",upload.single("profileImageUrl"),async(req,res)=>{
         //handle file upload to cloudinary
         if(req.file){
             const uploadResult=await uploadToCloudinary(req.file.buffer)
-            newUser.profileImageURL=uploadResult.secure_url
+            newUser.profileImageUrl=uploadResult.secure_url
         }
         
         //create new user document
